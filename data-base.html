@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-commerce Domain: Entities & Attributes</title>
+</head>
+<body>
+  <h1>E-commerce Domain: Entities & Attributes</h1>
+  <p>A comprehensive reference for database design in an e-commerce platform. Each entity contains detailed attributes with recommended data types and technical justifications.</p>
+
+  <h2>1. Customer</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>CustomerID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique identifier for each customer; integer for optimal indexing performance.</td></tr>
+    <tr><td>FirstName</td><td>VARCHAR(50)</td><td>Variable length for efficient storage; 50 chars supports international names.</td></tr>
+    <tr><td>LastName</td><td>VARCHAR(50)</td><td>Variable length string for family names across cultures.</td></tr>
+    <tr><td>Email</td><td>VARCHAR(254)</td><td>RFC 5321 compliant maximum email length; used for authentication.</td></tr>
+    <tr><td>PasswordHash</td><td>CHAR(60)</td><td>Fixed length for BCrypt/Argon2 hashes; secure password storage.</td></tr>
+    <tr><td>PhoneNumber</td><td>VARCHAR(20)</td><td>Accommodates international formats, +, spaces, and leading zeros.</td></tr>
+    <tr><td>DateOfBirth</td><td>DATE</td><td>Age verification, targeted marketing; no time component needed.</td></tr>
+    <tr><td>Gender</td><td>ENUM('Male','Female','Other','Prefer not to say')</td><td>Constrained set with privacy option; efficient storage.</td></tr>
+    <tr><td>Address</td><td>TEXT</td><td>Multi-line addresses with varying lengths; supports international formats.</td></tr>
+    <tr><td>RegistrationDate</td><td>DATETIME</td><td>Audit trail and customer lifecycle analysis with timestamp precision.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Account status flag; 1 bit storage for enabled/disabled state.</td></tr>
+    <tr><td>LastLoginDate</td><td>DATETIME</td><td>User engagement tracking and security monitoring.</td></tr>
+  </table>
+
+  <h2>2. Product</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>ProductID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Primary key for product identification; integer for join efficiency.</td></tr>
+    <tr><td>ProductName</td><td>VARCHAR(200)</td><td>Product titles can be lengthy; supports SEO-friendly names.</td></tr>
+    <tr><td>Description</td><td>TEXT</td><td>Detailed product descriptions of varying lengths; rich content support.</td></tr>
+    <tr><td>Price</td><td>DECIMAL(10,2)</td><td>Monetary values with 2 decimal precision; avoids floating-point errors.</td></tr>
+    <tr><td>CategoryID</td><td>INT (FK)</td><td>Foreign key to Category table; normalized design.</td></tr>
+    <tr><td>SupplierID</td><td>INT (FK)</td><td>Links to supplier information; referential integrity.</td></tr>
+    <tr><td>StockQuantity</td><td>INT</td><td>Inventory tracking; whole numbers for item counts.</td></tr>
+    <tr><td>Weight</td><td>DECIMAL(8,3)</td><td>Shipping calculations; 3 decimal places for precise measurements.</td></tr>
+    <tr><td>Dimensions</td><td>VARCHAR(50)</td><td>Length×Width×Height format; shipping and storage planning.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Product visibility control; discontinued items remain in database.</td></tr>
+    <tr><td>CreatedDate</td><td>DATETIME</td><td>Product lifecycle tracking; catalog management.</td></tr>
+    <tr><td>LastModified</td><td>DATETIME</td><td>Change tracking for inventory and pricing updates.</td></tr>
+  </table>
+
+  <h2>3. Category</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>CategoryID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique category identifier for hierarchical organization.</td></tr>
+    <tr><td>CategoryName</td><td>VARCHAR(100)</td><td>Category names with reasonable length limit.</td></tr>
+    <tr><td>Description</td><td>TEXT</td><td>Detailed category descriptions for SEO and user guidance.</td></tr>
+    <tr><td>ParentCategoryID</td><td>INT (FK, NULL)</td><td>Self-referencing for category hierarchy; NULL for root categories.</td></tr>
+    <tr><td>ImageURL</td><td>VARCHAR(255)</td><td>Category banner/icon paths; URL length accommodation.</td></tr>
+    <tr><td>SortOrder</td><td>INT</td><td>Display ordering control; manual arrangement capability.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Category visibility management; seasonal categories.</td></tr>
+    <tr><td>MetaTitle</td><td>VARCHAR(60)</td><td>SEO optimization; search engine title tags.</td></tr>
+    <tr><td>MetaDescription</td><td>VARCHAR(160)</td><td>SEO meta descriptions; search result snippets.</td></tr>
+    <tr><td>CreatedDate</td><td>DATETIME</td><td>Category creation tracking for analytics.</td></tr>
+    <tr><td>ProductCount</td><td>INT</td><td>Cached count for performance; updated via triggers.</td></tr>
+    <tr><td>Level</td><td>TINYINT</td><td>Hierarchy depth tracking; breadcrumb generation.</td></tr>
+  </table>
+
+  <h2>4. Order</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>OrderID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique order identifier; sequential numbering for tracking.</td></tr>
+    <tr><td>CustomerID</td><td>INT (FK)</td><td>Links to customer record; maintains customer history.</td></tr>
+    <tr><td>OrderDate</td><td>DATETIME</td><td>Precise order timestamp for processing and analytics.</td></tr>
+    <tr><td>Status</td><td>ENUM('Pending','Processing','Shipped','Delivered','Cancelled')</td><td>Workflow state management; predefined status values.</td></tr>
+    <tr><td>TotalAmount</td><td>DECIMAL(12,2)</td><td>Order total with tax; higher precision for large orders.</td></tr>
+    <tr><td>ShippingAddress</td><td>TEXT</td><td>Complete delivery address; may differ from customer address.</td></tr>
+    <tr><td>BillingAddress</td><td>TEXT</td><td>Billing information; financial record keeping.</td></tr>
+    <tr><td>PaymentStatus</td><td>ENUM('Pending','Paid','Failed','Refunded')</td><td>Payment state tracking; financial reconciliation.</td></tr>
+    <tr><td>ShippingCost</td><td>DECIMAL(8,2)</td><td>Separate shipping charges; cost analysis.</td></tr>
+    <tr><td>TaxAmount</td><td>DECIMAL(10,2)</td><td>Tax calculation storage; compliance reporting.</td></tr>
+    <tr><td>DiscountAmount</td><td>DECIMAL(10,2)</td><td>Applied discounts and coupons; promotion tracking.</td></tr>
+    <tr><td>EstimatedDelivery</td><td>DATE</td><td>Customer expectation setting; logistics planning.</td></tr>
+  </table>
+
+  <h2>5. Payment</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>PaymentID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique payment transaction identifier.</td></tr>
+    <tr><td>OrderID</td><td>INT (FK)</td><td>Links payment to specific order; transaction tracking.</td></tr>
+    <tr><td>PaymentMethod</td><td>ENUM('Credit Card','Debit Card','PayPal','Bank Transfer','Cash')</td><td>Payment type classification; reporting and processing.</td></tr>
+    <tr><td>Amount</td><td>DECIMAL(12,2)</td><td>Payment amount with precision; financial accuracy.</td></tr>
+    <tr><td>Currency</td><td>CHAR(3)</td><td>ISO 4217 currency codes; international support.</td></tr>
+    <tr><td>TransactionID</td><td>VARCHAR(100)</td><td>External payment processor reference; reconciliation.</td></tr>
+    <tr><td>Status</td><td>ENUM('Pending','Completed','Failed','Cancelled','Refunded')</td><td>Payment state management; financial workflow.</td></tr>
+    <tr><td>PaymentDate</td><td>DATETIME</td><td>Transaction timestamp; financial records.</td></tr>
+    <tr><td>ProcessorResponse</td><td>TEXT</td><td>Gateway response details; troubleshooting failed payments.</td></tr>
+    <tr><td>LastFourDigits</td><td>CHAR(4)</td><td>Card identification for customer service; PCI compliance.</td></tr>
+    <tr><td>ExpiryDate</td><td>DATE</td><td>Card validity tracking; payment failure prevention.</td></tr>
+    <tr><td>ProcessingFee</td><td>DECIMAL(8,2)</td><td>Gateway charges; profit margin calculation.</td></tr>
+  </table>
+
+  <h2>6. Review</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>ReviewID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique review identifier for reference and moderation.</td></tr>
+    <tr><td>ProductID</td><td>INT (FK)</td><td>Links review to specific product; product rating aggregation.</td></tr>
+    <tr><td>CustomerID</td><td>INT (FK)</td><td>Review author identification; prevents duplicate reviews.</td></tr>
+    <tr><td>Rating</td><td>TINYINT</td><td>1-5 star rating; small integer for efficient storage.</td></tr>
+    <tr><td>ReviewTitle</td><td>VARCHAR(200)</td><td>Review headline; summarizes customer opinion.</td></tr>
+    <tr><td>ReviewText</td><td>TEXT</td><td>Detailed review content; variable length feedback.</td></tr>
+    <tr><td>ReviewDate</td><td>DATETIME</td><td>Review timestamp; chronological ordering and freshness.</td></tr>
+    <tr><td>IsVerifiedPurchase</td><td>BOOLEAN</td><td>Purchase validation; authentic review identification.</td></tr>
+    <tr><td>HelpfulCount</td><td>INT</td><td>Community feedback on review quality; helpful sorting.</td></tr>
+    <tr><td>IsModerated</td><td>BOOLEAN</td><td>Content moderation flag; spam and abuse control.</td></tr>
+    <tr><td>ModeratorNotes</td><td>TEXT</td><td>Internal moderation comments; policy enforcement tracking.</td></tr>
+    <tr><td>IsPublished</td><td>BOOLEAN</td><td>Publication status; pending/approved review workflow.</td></tr>
+  </table>
+
+  <h2>7. Supplier</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>SupplierID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique supplier identification for vendor management.</td></tr>
+    <tr><td>CompanyName</td><td>VARCHAR(200)</td><td>Business name; accommodates long corporate names.</td></tr>
+    <tr><td>ContactPerson</td><td>VARCHAR(100)</td><td>Primary contact name; relationship management.</td></tr>
+    <tr><td>Email</td><td>VARCHAR(254)</td><td>Business communication; order and inquiry handling.</td></tr>
+    <tr><td>PhoneNumber</td><td>VARCHAR(20)</td><td>Business contact; international format support.</td></tr>
+    <tr><td>Address</td><td>TEXT</td><td>Complete business address; shipping origin information.</td></tr>
+    <tr><td>TaxID</td><td>VARCHAR(50)</td><td>Tax identification; compliance and financial records.</td></tr>
+    <tr><td>PaymentTerms</td><td>VARCHAR(100)</td><td>Payment conditions; Net 30, COD, etc.</td></tr>
+    <tr><td>Currency</td><td>CHAR(3)</td><td>Preferred trading currency; ISO standard codes.</td></tr>
+    <tr><td>Rating</td><td>DECIMAL(3,2)</td><td>Supplier performance score; vendor evaluation.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Active relationship status; vendor lifecycle management.</td></tr>
+    <tr><td>RegistrationDate</td><td>DATETIME</td><td>Partnership start date; relationship history.</td></tr>
+  </table>
+
+  <h2>8. Shipping</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>ShippingID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique shipping record identifier for tracking.</td></tr>
+    <tr><td>OrderID</td><td>INT (FK)</td><td>Links to order being shipped; fulfillment tracking.</td></tr>
+    <tr><td>CarrierName</td><td>VARCHAR(100)</td><td>Shipping company name; FedEx, UPS, DHL, etc.</td></tr>
+    <tr><td>TrackingNumber</td><td>VARCHAR(50)</td><td>Carrier tracking code; customer shipment visibility.</td></tr>
+    <tr><td>ShippingMethod</td><td>VARCHAR(50)</td><td>Service level; Standard, Express, Overnight.</td></tr>
+    <tr><td>ShippedDate</td><td>DATETIME</td><td>Dispatch timestamp; delivery calculation base.</td></tr>
+    <tr><td>DeliveredDate</td><td>DATETIME</td><td>Actual delivery time; performance metrics.</td></tr>
+    <tr><td>ShippingCost</td><td>DECIMAL(8,2)</td><td>Actual shipping charges; cost analysis.</td></tr>
+    <tr><td>Weight</td><td>DECIMAL(8,3)</td><td>Package weight; shipping cost verification.</td></tr>
+    <tr><td>Status</td><td>ENUM('Preparing','Shipped','In Transit','Delivered','Exception')</td><td>Shipment status workflow; customer communication.</td></tr>
+    <tr><td>DeliveryAddress</td><td>TEXT</td><td>Complete delivery location; GPS coordinates possible.</td></tr>
+    <tr><td>SignatureRequired</td><td>BOOLEAN</td><td>Delivery confirmation requirement; security measures.</td></tr>
+  </table>
+
+  <h2>9. Cart</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>CartID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique cart identifier; session and persistence management.</td></tr>
+    <tr><td>CustomerID</td><td>INT (FK, NULL)</td><td>Cart owner; NULL for guest sessions.</td></tr>
+    <tr><td>SessionID</td><td>VARCHAR(128)</td><td>Browser session tracking; guest cart preservation.</td></tr>
+    <tr><td>ProductID</td><td>INT (FK)</td><td>Cart item reference; product information lookup.</td></tr>
+    <tr><td>Quantity</td><td>INT</td><td>Item count in cart; inventory checking.</td></tr>
+    <tr><td>Price</td><td>DECIMAL(10,2)</td><td>Price at time of addition; protects against price changes.</td></tr>
+    <tr><td>AddedDate</td><td>DATETIME</td><td>Cart addition timestamp; abandoned cart analysis.</td></tr>
+    <tr><td>UpdatedDate</td><td>DATETIME</td><td>Last modification time; activity tracking.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Cart item status; soft deletion for recovery.</td></tr>
+    <tr><td>ProductOptions</td><td>JSON</td><td>Size, color, variants; flexible attribute storage.</td></tr>
+    <tr><td>DiscountAmount</td><td>DECIMAL(8,2)</td><td>Applied item-level discounts; promotion tracking.</td></tr>
+    <tr><td>SavedForLater</td><td>BOOLEAN</td><td>Wishlist functionality; purchase intent tracking.</td></tr>
+  </table>
+
+  <h2>10. Coupon</h2>
+  <table border="1">
+    <tr><th>Attribute</th><th>Data Type</th><th>Justification</th></tr>
+    <tr><td>CouponID</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique coupon identifier for tracking and validation.</td></tr>
+    <tr><td>CouponCode</td><td>VARCHAR(50)</td><td>Customer-entered code; alphanumeric promotion codes.</td></tr>
+    <tr><td>Description</td><td>VARCHAR(200)</td><td>Coupon purpose and terms; customer understanding.</td></tr>
+    <tr><td>DiscountType</td><td>ENUM('Percentage','Fixed Amount','Free Shipping')</td><td>Discount calculation method; promotion flexibility.</td></tr>
+    <tr><td>DiscountValue</td><td>DECIMAL(8,2)</td><td>Discount amount or percentage; promotion value.</td></tr>
+    <tr><td>MinimumAmount</td><td>DECIMAL(10,2)</td><td>Order minimum for coupon validity; promotion conditions.</td></tr>
+    <tr><td>MaximumDiscount</td><td>DECIMAL(8,2)</td><td>Discount cap for percentage coupons; budget control.</td></tr>
+    <tr><td>StartDate</td><td>DATETIME</td><td>Promotion start time; campaign scheduling.</td></tr>
+    <tr><td>EndDate</td><td>DATETIME</td><td>Promotion expiration; time-limited offers.</td></tr>
+    <tr><td>UsageLimit</td><td>INT</td><td>Maximum uses allowed; promotion budget control.</td></tr>
+    <tr><td>UsedCount</td><td>INT</td><td>Current usage tracking; availability calculation.</td></tr>
+    <tr><td>IsActive</td><td>BOOLEAN</td><td>Coupon status; enable/disable promotion control.</td></tr>
+  </table>
+</body>
+</html>

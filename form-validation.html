@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Validation and Event Handling</title>
+</head>
+<body>
+    <h2>Student Registration Form</h2>
+    
+    <form id="studentForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <span id="nameError" style="color: red;"></span>
+        <br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <span id="emailError" style="color: red;"></span>
+        <br><br>
+        
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" min="18" max="100" required>
+        <span id="ageError" style="color: red;"></span>
+        <br><br>
+        
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone">
+        <span id="phoneError" style="color: red;"></span>
+        <br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="passwordError" style="color: red;"></span>
+        <br><br>
+        
+        <button type="submit">Submit</button>
+        <button type="button" id="resetBtn">Reset</button>
+    </form>
+    
+    <div id="output" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; display: none;">
+        <h3>Form Data:</h3>
+        <div id="displayData"></div>
+    </div>
+
+    <script>
+        // Get form elements
+        const form = document.getElementById('studentForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const ageInput = document.getElementById('age');
+        const phoneInput = document.getElementById('phone');
+        const passwordInput = document.getElementById('password');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Validation functions
+        function validateName() {
+            const name = nameInput.value.trim();
+            const error = document.getElementById('nameError');
+            
+            if (name.length < 2) {
+                error.textContent = ' - Name must be at least 2 characters';
+                return false;
+            } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+                error.textContent = ' - Name can only contain letters and spaces';
+                return false;
+            } else {
+                error.textContent = '';
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const error = document.getElementById('emailError');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailPattern.test(email)) {
+                error.textContent = ' - Please enter a valid email';
+                return false;
+            } else {
+                error.textContent = '';
+                return true;
+            }
+        }
+
+        function validateAge() {
+            const age = parseInt(ageInput.value);
+            const error = document.getElementById('ageError');
+            
+            if (isNaN(age) || age < 18 || age > 100) {
+                error.textContent = ' - Age must be between 18 and 100';
+                return false;
+            } else {
+                error.textContent = '';
+                return true;
+            }
+        }
+
+        function validatePhone() {
+            const phone = phoneInput.value.trim();
+            const error = document.getElementById('phoneError');
+            
+            if (phone && !/^\d{10}$/.test(phone)) {
+                error.textContent = ' - Phone must be 10 digits';
+                return false;
+            } else {
+                error.textContent = '';
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const error = document.getElementById('passwordError');
+            
+            if (password.length < 6) {
+                error.textContent = ' - Password must be at least 6 characters';
+                return false;
+            } else {
+                error.textContent = '';
+                return true;
+            }
+        }
+
+        // Event Handlers
+        
+        // Real-time validation on input
+        nameInput.addEventListener('input', validateName);
+        emailInput.addEventListener('input', validateEmail);
+        ageInput.addEventListener('input', validateAge);
+        phoneInput.addEventListener('input', validatePhone);
+        passwordInput.addEventListener('input', validatePassword);
+
+        // Focus events
+        nameInput.addEventListener('focus', function() {
+            console.log('Name field focused');
+        });
+
+        emailInput.addEventListener('focus', function() {
+            console.log('Email field focused');
+        });
+
+        // Blur events (when field loses focus)
+        nameInput.addEventListener('blur', function() {
+            console.log('Name field lost focus');
+            validateName();
+        });
+
+        emailInput.addEventListener('blur', function() {
+            console.log('Email field lost focus');
+            validateEmail();
+        });
+
+        // Mouse events
+        form.addEventListener('mouseenter', function() {
+            console.log('Mouse entered form area');
+        });
+
+        form.addEventListener('mouseleave', function() {
+            console.log('Mouse left form area');
+        });
+
+        // Keyboard events
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT') {
+                console.log('Enter key pressed on input field');
+            }
+        });
+
+        // Form submission event
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            console.log('Form submission attempted');
+            
+            // Validate all fields
+            const isNameValid = validateName();
+            const isEmailValid = validateEmail();
+            const isAgeValid = validateAge();
+            const isPhoneValid = validatePhone();
+            const isPasswordValid = validatePassword();
+            
+            // Check if all required fields are valid
+            if (isNameValid && isEmailValid && isAgeValid && isPhoneValid && isPasswordValid) {
+                // Display form data
+                displayFormData();
+                console.log('Form submitted successfully');
+                alert('Form submitted successfully!');
+            } else {
+                console.log('Form validation failed');
+                alert('Please fix the errors before submitting');
+            }
+        });
+
+        // Reset button event
+        resetBtn.addEventListener('click', function() {
+            // Clear all error messages
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('ageError').textContent = '';
+            document.getElementById('phoneError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            
+            // Hide output div
+            document.getElementById('output').style.display = 'none';
+            
+            // Reset form
+            form.reset();
+            console.log('Form reset');
+        });
+
+        // Function to display form data
+        function displayFormData() {
+            const outputDiv = document.getElementById('output');
+            const displayDiv = document.getElementById('displayData');
+            
+            const formData = {
+                name: nameInput.value,
+                email: emailInput.value,
+                age: ageInput.value,
+                phone: phoneInput.value || 'Not provided',
+                password: '•'.repeat(passwordInput.value.length) // Hide password
+            };
+            
+            let html = '';
+            for (let key in formData) {
+                html += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${formData[key]}</p>`;
+            }
+            
+            displayDiv.innerHTML = html;
+            outputDiv.style.display = 'block';
+        }
+
+        // Window load event
+        window.addEventListener('load', function() {
+            console.log('Page fully loaded');
+        });
+
+        // Window beforeunload event
+        window.addEventListener('beforeunload', function(event) {
+            // Check if form has data
+            if (nameInput.value || emailInput.value || ageInput.value) {
+                event.preventDefault();
+                event.returnValue = 'You have unsaved changes';
+            }
+        });
+
+        console.log('Form validation script loaded');
+    </script>
+</body>
+</html>
